@@ -55,10 +55,6 @@ struct TodayView: View {
                     Text("\(viewModel.caloriesUsed)")
                         .font(.system(size: 42, weight: .bold, design: .rounded))
                         .foregroundColor(.primary)
-                    
-                    Text("of \(viewModel.caloriesGoal) kcal")
-                        .font(.system(size: 16, weight: .medium, design: .rounded))
-                        .foregroundColor(.secondary)
                 }
             }
             
