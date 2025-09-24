@@ -3,10 +3,18 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(AppState.self) private var appState
+    @State private var hasSeenIntro = UserDefaults.standard.bool(forKey: "hasSeenIntro")
     @State private var isOnboardingComplete = UserDefaults.standard.bool(forKey: "isOnboardingComplete")
     
     var body: some View {
-        if !isOnboardingComplete {
+        if !hasSeenIntro {
+            IntroView()
+                .transition(.opacity)
+                .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
+                    hasSeenIntro = UserDefaults.standard.bool(forKey: "hasSeenIntro")
+                    isOnboardingComplete = UserDefaults.standard.bool(forKey: "isOnboardingComplete")
+                }
+        } else if !isOnboardingComplete {
             OnboardingView()
                 .transition(.opacity)
                 .onReceive(NotificationCenter.default.publisher(for: UserDefaults.didChangeNotification)) { _ in
