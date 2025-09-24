@@ -6,17 +6,29 @@ struct IntroView: View {
   @State private var currentPage = 0
   @State private var animateElements = false
   @State private var showContent = false
+  @State private var meshAnimating = false
   
   var body: some View {
     ZStack {
-      // Background gradient
-      LinearGradient(
-        colors: backgroundColors,
-        startPoint: .topLeading,
-        endPoint: .bottomTrailing
+      // Mesh gradient background
+      MeshGradient(
+        width: 3,
+        height: 3,
+        points: [
+          [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+          [0.0, 0.5], [meshAnimating ? 0.3 : 0.7, 0.5], [1.0, 0.5],
+          [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
+        ],
+        colors: meshColors
       )
       .ignoresSafeArea()
+      .animation(.easeInOut(duration: 2.0), value: meshAnimating)
       .animation(.easeInOut(duration: 0.8), value: currentPage)
+      
+      // Dark overlay for better readability
+      Rectangle()
+        .fill(Color.black.opacity(0.3))
+        .ignoresSafeArea()
       
       VStack(spacing: 0) {
         // Skip button
@@ -89,6 +101,10 @@ struct IntroView: View {
         animateElements = true
         showContent = true
       }
+      
+      withAnimation(.easeInOut(duration: 3.0).repeatForever(autoreverses: true)) {
+        meshAnimating = true
+      }
     }
     .onChange(of: currentPage) { _, _ in
       animateElements = false
@@ -100,16 +116,35 @@ struct IntroView: View {
     }
   }
   
-  private var backgroundColors: [Color] {
+  private var meshColors: [Color] {
     switch currentPage {
     case 0:
-      return [Color(hex: "667EEA"), Color(hex: "764BA2")]
+      // Health/fresh theme - greens and teals
+      return [
+        Color(hex: "52C41A"), Color(hex: "73D13D"), Color(hex: "95DE64"),
+        Color(hex: "36CFC9"), Color(hex: "5CDBD3"), Color(hex: "87E8DE"),
+        Color(hex: "389E0D"), Color(hex: "52C41A"), Color(hex: "73D13D")
+      ]
     case 1:
-      return [Color(hex: "F093FB"), Color(hex: "F5576C")]
+      // Energy theme - oranges and yellows
+      return [
+        Color(hex: "FA8C16"), Color(hex: "FFA940"), Color(hex: "FFD666"),
+        Color(hex: "FAAD14"), Color(hex: "FFC53D"), Color(hex: "FFE58F"),
+        Color(hex: "D46B08"), Color(hex: "FA8C16"), Color(hex: "FFA940")
+      ]
     case 2:
-      return [Color(hex: "4FACFE"), Color(hex: "00F2FE")]
+      // Balance theme - blues and purples
+      return [
+        Color(hex: "722ED1"), Color(hex: "9254DE"), Color(hex: "B37FEB"),
+        Color(hex: "2F54EB"), Color(hex: "597EF7"), Color(hex: "85A5FF"),
+        Color(hex: "1D39C4"), Color(hex: "2F54EB"), Color(hex: "597EF7")
+      ]
     default:
-      return [Color(hex: "667EEA"), Color(hex: "764BA2")]
+      return [
+        Color(hex: "52C41A"), Color(hex: "73D13D"), Color(hex: "95DE64"),
+        Color(hex: "36CFC9"), Color(hex: "5CDBD3"), Color(hex: "87E8DE"),
+        Color(hex: "389E0D"), Color(hex: "52C41A"), Color(hex: "73D13D")
+      ]
     }
   }
   

@@ -5,6 +5,7 @@ struct OnboardingView: View {
   @Environment(\.modelContext) private var modelContext
   @State private var currentStep = 0
   @State private var animateElements = false
+  @State private var meshAnimating = false
   
   // User inputs
   @State private var userName = ""
@@ -52,10 +53,25 @@ struct OnboardingView: View {
   
   var body: some View {
     ZStack {
-      // Animated background
-      backgroundGradient
+      // Mesh gradient background
+      MeshGradient(
+        width: 3,
+        height: 3,
+        points: [
+          [0.0, 0.0], [0.5, 0.0], [1.0, 0.0],
+          [0.0, 0.5], [meshAnimating ? 0.2 : 0.8, meshAnimating ? 0.3 : 0.7], [1.0, 0.5],
+          [0.0, 1.0], [0.5, 1.0], [1.0, 1.0]
+        ],
+        colors: meshColors
+      )
+      .ignoresSafeArea()
+      .animation(.easeInOut(duration: 2.5), value: meshAnimating)
+      .animation(.easeInOut(duration: 1.0), value: currentStep)
+      
+      // Dark overlay for better readability
+      Rectangle()
+        .fill(Color.black.opacity(0.4))
         .ignoresSafeArea()
-        .animation(.easeInOut(duration: 1.0), value: currentStep)
       
       VStack {
         // Progress dots
@@ -114,6 +130,10 @@ struct OnboardingView: View {
         animateElements = true
         showEmoji = true
       }
+      
+      withAnimation(.easeInOut(duration: 3.5).repeatForever(autoreverses: true)) {
+        meshAnimating = true
+      }
     }
     .onChange(of: currentStep) { _, _ in
       animateElements = false
@@ -124,23 +144,43 @@ struct OnboardingView: View {
     }
   }
   
-  private var backgroundGradient: LinearGradient {
-    let colors: [Color] = {
-      switch currentStep {
-      case 0:
-        return [Color(hex: "667EEA"), Color(hex: "764BA2")]
-      case 1:
-        return [Color(hex: "FA709A"), Color(hex: "FEE140")]
-      case 2:
-        return [Color(hex: "30CED7"), Color(hex: "3D94F6")]
-      case 3:
-        return [Color(hex: "F093FB"), Color(hex: "F5576C")]
-      default:
-        return [Color(hex: "667EEA"), Color(hex: "764BA2")]
-      }
-    }()
-    
-    return LinearGradient(colors: colors, startPoint: .topLeading, endPoint: .bottomTrailing)
+  private var meshColors: [Color] {
+    switch currentStep {
+    case 0:
+      // Welcome - calming greens
+      return [
+        Color(hex: "52C41A"), Color(hex: "95DE64"), Color(hex: "73D13D"),
+        Color(hex: "73D13D"), Color(hex: "52C41A"), Color(hex: "95DE64"),
+        Color(hex: "389E0D"), Color(hex: "73D13D"), Color(hex: "52C41A")
+      ]
+    case 1:
+      // Goals - energetic oranges
+      return [
+        Color(hex: "FA8C16"), Color(hex: "FAAD14"), Color(hex: "FFA940"),
+        Color(hex: "FFC53D"), Color(hex: "FFD666"), Color(hex: "FFE58F"),
+        Color(hex: "D46B08"), Color(hex: "FA8C16"), Color(hex: "FAAD14")
+      ]
+    case 2:
+      // Calories - warm reds/oranges
+      return [
+        Color(hex: "F5222D"), Color(hex: "FF4D4F"), Color(hex: "FF7875"),
+        Color(hex: "FA541C"), Color(hex: "FF7A45"), Color(hex: "FFA940"),
+        Color(hex: "CF1322"), Color(hex: "F5222D"), Color(hex: "FA541C")
+      ]
+    case 3:
+      // Macros - balanced blues
+      return [
+        Color(hex: "1890FF"), Color(hex: "40A9FF"), Color(hex: "69C0FF"),
+        Color(hex: "36CFC9"), Color(hex: "5CDBD3"), Color(hex: "87E8DE"),
+        Color(hex: "0050B3"), Color(hex: "1890FF"), Color(hex: "36CFC9")
+      ]
+    default:
+      return [
+        Color(hex: "52C41A"), Color(hex: "95DE64"), Color(hex: "73D13D"),
+        Color(hex: "73D13D"), Color(hex: "52C41A"), Color(hex: "95DE64"),
+        Color(hex: "389E0D"), Color(hex: "73D13D"), Color(hex: "52C41A")
+      ]
+    }
   }
   
   // MARK: - Step 1: Name
